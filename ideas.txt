@@ -1,0 +1,19 @@
+individuals could be:
+bacteria
+viruses
+small animals like squids
+
+parameters could be:
+optimum pH, pH range that is survivable
+optimum temperature, temperature that is survivable
+life span
+repdoductive rate
+color, for camouflage
+
+some parameters should be user controlled; such as environment pH, temp, background color
+some parameters can be inherited or randomly mutated, but they cannot exceed a certain total score: life span and reproductive rate can't both be high. optimum pH range and temp range can't both be large.
+
+how to harness user data in a useful way?
+start by collecting user data and analysing statistically. insights may or may not result.
+
+e.g. what are the best organism that develop? is there a trend?
