@@ -9,23 +9,23 @@ def match(a,b):
 		if b is 'C':
 			return 1
 		else:
-			return -1
+			return 0
 	if a is 'C':
 		if b is 'G':
 			return 1
 		else:
-			return -1
+			return 0
 	if a is 'A':
 		if b is 'U':
 			return 1
 		else:
-			return -1
+			return 0
 	if a is 'U':
 		if b is 'A':
 			return 1
 		else:
-			return -1
-	else: return -10
+			return 0
+	else: return 0
 
 def fill_field(m,i,j):
 	#i,j base pair
@@ -78,6 +78,6 @@ while i >= 0:
 		j = i+1
 	else:
 		j = j+1
-print_array(m)
+#print_array(m)
 print "\nscore:", m[0][len(m)-1]
 
