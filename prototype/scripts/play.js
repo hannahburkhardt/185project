@@ -1,6 +1,6 @@
  myPanel = new jsgl.Panel(document.getElementById("panel"));
  
-/* Define objects */
+/* Define orange thing */
 
 var init = function (shape) {
   shape.getStroke().setWeight(0);
@@ -31,7 +31,7 @@ first.addMouseMoveListener(function (eventArgs) {
   }
 });
 
-/* Create polygon and modify it */
+/* Define blue thing */
 polygon = myPanel.createPolygon();
 polygon.addPointXY(50,50);
 polygon.addPointXY(110,50);
@@ -43,6 +43,7 @@ polygon.getStroke().setColor("#015BC2");
 polygon.getFill().setColor("#015BC2");
 myPanel.addElement(polygon);
 
+/* Define purple thing */
 polygon2 = myPanel.createPolygon();
 polygon2.addPointXY(110,50);
 polygon2.addPointXY(210,50);
@@ -60,6 +61,7 @@ polygon2.addMouseUpListener(function () {
 });
 myPanel.addElement(polygon2);
 
+/* Define yellow cirlce */
 circle = myPanel.createCircle();
 circle.setCenterLocationXY(100,100);
 circle.setRadius(20);
