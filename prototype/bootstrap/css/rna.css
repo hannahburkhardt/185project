@@ -1,0 +1,17 @@
+.play-area {
+	background: white;
+	border-radius: 10px;
+	padding: 10px;
+	margin: 55px;
+}
+
+.flip-horizontal {
+    -moz-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+    filter: fliph; /*IE*/
+}
+
+.navbar-default {
+	background-color: #ccc;
+}
