@@ -1,5 +1,5 @@
 .play-area {
-	background: white;
+	background-color: white;
 	border-radius: 10px;
 	padding: 10px;
 	margin: 55px;
@@ -14,4 +14,8 @@
 
 .navbar-default {
 	background-color: #ccc;
+}
+
+.btn-right {
+	float: right;
 }
