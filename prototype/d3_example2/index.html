@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+    .node {
+        stroke: #fff;
+        stroke-width: 1.5px;
+    }
+
+    .link {
+        stroke: #999;
+        stroke-opacity: .6;
+    }
+
+</style>
+<body>
+<script src="d3.v3.min.js"></script>
+<script>
+
+    var width = 960,
+            height = 500;
+
+    var color = d3.scale.ordinal()
+            .domain([1, 2, 3, 4, 5, 6])
+            .range(["#339933","#33cc33","#cc0000","#ff6666","#e4d4ef","#efe4d4"]);
+
+    var force = d3.layout.force()
+            .charge(-150)
+            .alpha(-100)
+            .linkDistance(20)
+            .size([width, height]);
+
+    var svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+    d3.json("rna.json", function(error, graph) {
+        var nodes = graph.nodes;
+
+        var links = function () {
+            a = [];
+            for (var i = 0; i < nodes.length-1; i++) {
+                a.push({"source":i,"target":i+1,"value":2})
+            }
+            return a;
+        }();
+
+        force
+                .nodes(nodes)
+                .links(links)
+                .start();
+
+        var link = svg.selectAll(".link")
+                .data(links)
+                .enter().append("line")
+                .attr("class", "link")
+                .style("stroke-width", function(d) { return Math.sqrt(d.value); });
+
+        var node = svg.selectAll(".node")
+                .data(graph.nodes)
+                .enter().append("circle")
+                .attr("class", "node")
+                .attr("r", 5)
+                .style("fill", function(d) { return color(d.group); })
+                .call(force.drag);
+
+        node.append("title")
+                .text(function(d) { return d.name; });
+
+
+        var pairs = d3.nest().key(function(d) { return d.pair; }).entries(nodes);
+        var groupPath = function(d) {
+            return "M" +
+                    d3.geom.polygon(d.values.map(function(i) { return [i.x, i.y]; }))
+                            .join("L")
+                    + "Z";
+        };
+        //d is the set of nodes in this pair. There are two: d.values[0] and d.values[1]
+        var groupFill = function(d, i) {
+            // If this pair consists of an A and a U, color it one color.
+            // Otherwise, color it the other color.
+            if (d.values[0].group == "1" || d.values[0].group == "2") return color(1);
+            else return color(3);
+        };
+
+
+        force.on("tick", function(e) {
+            link
+                    .attr("x1", function(d) { return d.source.x; })
+                    .attr("y1", function(d) { return d.source.y; })
+                    .attr("x2", function(d) { return d.target.x; })
+                    .attr("y2", function(d) { return d.target.y; });
+
+            var k = 0.1 * e.alpha;
+            nodes.forEach(function(o, i) {
+                o.x += i & 2 ? k : -k;
+                o.y += i & 1 ? k : -k;
+            });
+
+            node
+                    .attr("cx", function(d) { return d.x; })
+                    .attr("cy", function(d) { return d.y; });
+
+            svg.selectAll("path")
+                    .data(pairs)
+                    .attr("d", groupPath)
+                    .enter().insert("path", "circle")
+                    .style("fill", groupFill)
+                    .style("stroke", groupFill)
+                    .style("stroke-width", 20)
+                    .style("stroke-linejoin", "round")
+                    .style("opacity", .2)
+                    .attr("d", groupPath);
+
+
+        });
+    });
+
+</script>
