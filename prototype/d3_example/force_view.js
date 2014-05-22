@@ -9,6 +9,11 @@ var selected_node = null,
     mousedown_node = null,
     mouseup_node = null;
 
+//set colors
+var color = d3.scale.ordinal()
+    .domain([1, 2, 3, 4, 5, 6])
+    .range(["#339933","#33cc33","#cc0000","#ff6666","#e4d4ef","#efe4d4"]);
+
 // init svg
 var outer = d3.select("#chart")
   .append("svg:svg")
@@ -33,7 +38,34 @@ vis.append('svg:rect')
 // init force layout
 var force = d3.layout.force()
     .size([width, height])
-    .nodes([{}]) // initialize with a single node
+    .nodes([
+        {"group":1},
+        {"group":4},
+        {"group":3},
+        {"group":1},
+        {"group":2},
+        {"group":2},
+        {"group":4},
+        {"group":3},
+        {"group":2},
+        {"group":1},
+        {"group":4},
+        {"group":3},
+        {"group":1},
+        {"group":2},
+        {"group":2},
+        {"group":4},
+        {"group":3},
+        {"group":2}
+
+    ]) // initialize nodes
+    .links(function () {
+        a = [];
+        for (var i = 0; i < 18-1; i++) {
+            a.push({"source":i,"target":i+1,"value":2})
+        }
+        return a;
+    }())
     .linkDistance(50)
     .charge(-200)
     .on("tick", tick);
@@ -57,6 +89,7 @@ var nodes = force.nodes(),
 d3.select(window)
     .on("keydown", keydown);
 
+console.log("init");
 redraw();
 
 // focus on svg
@@ -97,15 +130,17 @@ function mouseup() {
       // select new node
       selected_node = node;
       selected_link = null;
-      
+
       // add link to mousedown node
       links.push({source: mousedown_node, target: node});
     }
-
+    console.log("mousup");
     redraw();
   }
   // clear mouse event vars
   resetMouseVars();
+    console.log("mouse up!");
+
 }
 
 function resetMouseVars() {
@@ -136,7 +171,7 @@ function rescale() {
 
 // redraw force layout
 function redraw() {
-
+  console.log("redrawing");
   link = link.data(links);
 
   link.enter().insert("line", ".node")
@@ -146,8 +181,9 @@ function redraw() {
           mousedown_link = d; 
           if (mousedown_link == selected_link) selected_link = null;
           else selected_link = mousedown_link; 
-          selected_node = null; 
-          redraw(); 
+          selected_node = null;
+          console.log("from redraw insert line");
+          redraw();
         })
 
   link.exit().remove();
@@ -163,7 +199,9 @@ function redraw() {
       .on("mousedown", 
         function(d) { 
           // disable zoom
-          vis.call(d3.behavior.zoom().on("zoom"), null);
+            console.log(node);
+
+            vis.call(d3.behavior.zoom().on("zoom"), null);
 
           mousedown_node = d;
           if (mousedown_node == selected_node) selected_node = null;
@@ -177,7 +215,7 @@ function redraw() {
               .attr("y1", mousedown_node.y)
               .attr("x2", mousedown_node.x)
               .attr("y2", mousedown_node.y);
-
+            console.log("from redraw mousedown");
           redraw(); 
         })
       .on("mousedrag",
@@ -200,6 +238,7 @@ function redraw() {
 
             // enable zoom
             vis.call(d3.behavior.zoom().on("zoom"), rescale);
+              console.log("from redraw mouseup");
             redraw();
           } 
         })
@@ -223,6 +262,7 @@ function redraw() {
   }
 
   force.start();
+    console.log("End of redraw");
 
 }
 
@@ -249,6 +289,7 @@ function keydown() {
       }
       selected_link = null;
       selected_node = null;
+      console.log("keydown");
       redraw();
       break;
     }

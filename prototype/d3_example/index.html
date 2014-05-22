@@ -3,7 +3,7 @@
 <head>
 <title>Force Editor</title>
 <!-- <script src="d3.v2.min.js"></script> -->
-<script src="http://d3js.org/d3.v2.min.js"></script>
+<script src="d3.v2.min.js"></script>
 <!-- <script src="jquery-1.8.3.min.js"></script> -->
 <style>
 
@@ -15,13 +15,23 @@ body {
 }
 
 .node {
-  fill: #000;
+  fill: #74A44C;
   cursor: crosshair;
+  stroke: #FFF;
 }
 
+.a {
+  fill: #BC4B3A;
+}
+.u {
+  fill: #5287BF;
+}
+
+
+
 .node_selected {
-  fill: #ff7f0e;
-  stroke: #ff7f0e;
+  fill: #F1B837;
+  stroke: #FFFFFF;
 }
 
 .drag_line {
@@ -37,13 +47,16 @@ body {
 }
 
 .link {
-  stroke: #999;
-  stroke-width: 5;
+  stroke: #000;
+  stroke-width: 2;
   cursor: crosshair;
+}
+.h {
+  stroke: #888;
 }
 
 .link_selected {
-  stroke: #ff7f0e;
+  stroke: #F1B837;
 }
 
 </style>
