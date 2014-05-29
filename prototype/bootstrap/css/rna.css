@@ -31,4 +31,18 @@
 .link {
     stroke: #999;
     stroke-opacity: .6;
+    stroke-width: 1px;
+}
+
+.h_bond {
+    stroke: #49a9fa;
+    stroke-opacity: .6;
+    stroke-width: 2px;
+
+}
+
+.drag_line {
+    stroke: #49a9fa;
+    stroke-opacity: .6;
+    stroke-width: 2px;
 }

@@ -1,4 +1,57 @@
+//getSeq part
+var n = [];
+var readSeq = function () {
+    console.log("calling");
+    var input_seq = $(".inseq").val();
+    if (input_seq === "") return;
 
+    for (i in input_seq) {
+        var l;
+        switch (input_seq[i]) {
+            case 'A':
+            case 'a':
+                l = 'a';
+                break;
+            case 'C':
+            case 'c':
+                l = 'c';
+                break;
+            case 'G':
+            case 'g':
+                l = 'g';
+                break;
+            case 'U':
+            case 'u':
+                l = 'u';
+                break;
+            default:
+                l = 'a';
+                break;
+        }
+        n.push({
+            "base": l
+        });
+    }
+    console.log("returning: " + n);
+};
+
+
+$(".btn").on("click", function (event) {
+    readSeq();
+});
+
+$(".btn").on("keypress", function (event) {
+    if (event.keyCode === 13) //enter
+        readSeq();
+});
+
+
+
+
+
+
+
+//play part
 var width = 960,
     height = 500;
 
@@ -11,7 +64,7 @@ var selected_node = null,
 
 //set colors
 var color = d3.scale.ordinal()
-    .domain([1, 2, 3, 4, 5, 6])
+    .domain(['a', 'u', 'g', 'c', 5, 6])
     .range(["#339933","#33cc33","#cc0000","#ff6666","#e4d4ef","#efe4d4"]);
 
 
@@ -37,54 +90,21 @@ svg.append('svg:rect')
 var force = d3.layout.force()
     .size([width, height])
     .charge(-150)
-    .linkDistance(20);
+    .linkDistance(function (d) { if (d.type===0) return 20; else return 10;});
 
 //read in data
 //d3.json("rna/hairpinloop_5s.json", function(error, graph) {
     //var nodes = graph.nodes;
     var nodes = [
-        {"group":3},
-        {"group":3},
-        {"group":4},
-        {"group":4},
-        {"group":3},
-        {"group":1},
-        {"group":2},
-        {"group":3},
-        {"group":3},
-        {"group":2},
-        {"group":1},
-        {"group":3},
-        {"group":2},
-        {"group":3},
-        {"group":2},
-        {"group":3},
-        {"group":3},
-        {"group":3},
-        {"group":3},
-        {"group":2},
-        {"group":4},
-        {"group":2},
-        {"group":4},
-        {"group":4},
-        {"group":4},
-        {"group":4},
-        {"group":1},
-        {"group":2},
-        {"group":3},
-        {"group":4},
-        {"group":3},
-        {"group":1},
-        {"group":3},
-        {"group":1},
-        {"group":3},
-        {"group":2},
-        {"group":1},
-        {"group":3},
-        {"group":3},
-        {"group":4},
-        {"group":4},
-        {"group":4}
+        {base:"c",available:1},
+        {base:"c",available:1},
+        {base:"c",available:1},
+        {base:"a",available:1},
+        {base:"a",available:1},
+        {base:"a",available:1},
+        {base:"g",available:1},
+        {base:"g",available:1},
+        {base:"g",available:1}
     ];
 
 
@@ -93,7 +113,7 @@ var force = d3.layout.force()
     var links = function () {
         a = [];
         for (var i = 0; i < nodes.length - 1; i++) {
-            a.push({"source": i, "target": i + 1, "value": 2})
+            a.push({source: i, target: i + 1, type:0})
         }
         return a;
     }();
@@ -164,7 +184,7 @@ var force = d3.layout.force()
 
 // line displayed when dragging new nodes
 var drag_line = svg.append("line")
-    .attr("class", "drag_line")
+    .attr("class", "h-bond")
     .attr("x1", 0)
     .attr("y1", 0)
     .attr("x2", 0)
@@ -257,7 +277,8 @@ function redraw() {
     link.exit().remove();
 
     link
-        .classed("link_selected", function(d) { return d === selected_link; });
+        .classed("h_bond", function(d) { return d.type === 1; });
+    force.linkDistance(function (d) { if (d.type===0) return 20; else return 3;});
 
     node = node.data(nodes);
     console.log("line 229: "+node.enter());
@@ -277,7 +298,7 @@ function redraw() {
 
             // reposition drag line
             drag_line
-                .attr("class", "link")
+                .attr("class", "h_bond")
                 .attr("x1", mousedown_node.x)
                 .attr("y1", mousedown_node.y)
                 .attr("x2", mousedown_node.x)
@@ -291,27 +312,36 @@ function redraw() {
         })
         .on("mouseup",
         function(d) {
-            if (mousedown_node) {
-                mouseup_node = d;
-                if (mouseup_node == mousedown_node) { resetMouseVars(); return; }
+            if (d.available) {
+                if (mousedown_node && mousedown_node.available) {
+                    mouseup_node = d;
+                    if (mouseup_node == mousedown_node) { resetMouseVars(); return; }
+                    if ( (mousedown_node.base == 'a' && mouseup_node.base == 'a') ||
+                        (mousedown_node.base == 'u' && mouseup_node.base == 'a') ||
+                        (mousedown_node.base == 'g' && mouseup_node.base == 'c') ||
+                        (mousedown_node.base == 'c' && mouseup_node.base == 'g')  ) {
+                        // add link
+                        var link = {source: mousedown_node, target: mouseup_node, type:1};
+                        links.push(link);
 
-                // add link
-                var link = {source: mousedown_node, target: mouseup_node};
-                links.push(link);
+                        mousedown_node.available = 0;
+                        mouseup_node.available = 0;
 
-                // select new link
-                selected_link = link;
-                selected_node = null;
+                        // select new link
+                        selected_link = link;
+                        selected_node = null;
+                    }
 
-                // enable zoom
-                //svg.call(d3.behavior.zoom().on("zoom"), rescale);
-                redraw();
+                    // enable zoom
+                    //svg.call(d3.behavior.zoom().on("zoom"), rescale);
+                    redraw();
+                }
             }
         })
         .transition()
         .duration(750)
         .ease("elastic")
-        .style("fill", function(d) { return color(d.group); });
+        .style("fill", function(d) { return color(d.base); });
 
     node.exit().transition()
         .attr("r", 0)
@@ -346,12 +376,10 @@ function keydown() {
     switch (d3.event.keyCode) {
         case 8: // backspace
         case 46: { // delete
-            if (selected_node) {
-                nodes.splice(nodes.indexOf(selected_node), 1);
-                spliceLinksForNode(selected_node);
-            }
-            else if (selected_link) {
+            if (selected_link) {
                 links.splice(links.indexOf(selected_link), 1);
+                selected_link.source.available = 1;
+                selected_link.target.available = 1;
             }
             selected_link = null;
             selected_node = null;
