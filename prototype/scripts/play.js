@@ -108,15 +108,17 @@ var force = d3.layout.force()
 //d3.json("rna/hairpinloop_5s.json", function(error, graph) {
     //var nodes = graph.nodes;
     var nodes = [
-        {base:"c",available:1},
-        {base:"c",available:1},
-        {base:"c",available:1},
-        {base:"a",available:1},
-        {base:"a",available:1},
-        {base:"a",available:1},
         {base:"g",available:1},
         {base:"g",available:1},
-        {base:"g",available:1}
+        {base:"g",available:1},
+        {base:"g",available:1},
+        {base:"a",available:1},
+        {base:"a",available:1},
+        {base:"a",available:1},
+        {base:"c",available:1},
+        {base:"c",available:1},
+        {base:"c",available:1},
+        {base:"c",available:1},
     ];
 
 
