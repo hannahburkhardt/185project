@@ -1,7 +1,17 @@
-//getSeq part
+//-------------------------------------
+//-------------button def-------------
+//-------------------------------------
+$(".submit").on("click",function (e) {
+    console.log("Button clicked");
+});
+
+
+//-------------------------------------
+//-------------getSeq part-------------
+//-------------------------------------
 var n = [];
 var readSeq = function () {
-    console.log("calling");
+    //console.log("calling");
     var input_seq = $(".inseq").val();
     if (input_seq === "") return;
 
@@ -32,7 +42,7 @@ var readSeq = function () {
             "base": l
         });
     }
-    console.log("returning: " + n);
+    //console.log("returning: " + n);
 };
 
 
@@ -50,8 +60,10 @@ $(".btn").on("keypress", function (event) {
 
 
 
+//-----------------------------------
+//-------------play part-------------
+//-----------------------------------
 
-//play part
 var width = 960,
     height = 500;
 
@@ -248,7 +260,7 @@ function mouseup() {
     }
     // clear mouse event vars
     resetMouseVars();
-    console.log("mouse up!");
+    //console.log("mouse up!");
 }
 
 function resetMouseVars() {
@@ -260,13 +272,13 @@ function resetMouseVars() {
 // redraw force layout
 function redraw() {
 
-    console.log("redrawing");
+    //console.log("redrawing");
     link = link.data(links);
     link.enter().insert("line", ".node")
         .attr("class", "link")
         .on("mousedown",
         function(d) {
-            console.log("mouse down on link");
+            //console.log("mouse down on link");
             mousedown_link = d;
             if (mousedown_link == selected_link) selected_link = null;
             else selected_link = mousedown_link;
@@ -281,14 +293,14 @@ function redraw() {
     force.linkDistance(function (d) { if (d.type===0) return 20; else return 3;});
 
     node = node.data(nodes);
-    console.log("line 229: "+node.enter());
+    //console.log("line 229: "+node.enter());
     node.enter().insert("circle")
         .attr("class", "node")
         .attr("r", 6)
         .on("mousedown",
         function(d) {
             // disable zoom
-            console.log("Node clicked");
+            //console.log("Node clicked");
             //svg.call(d3.behavior.zoom().on("zoom"), null);
 
             mousedown_node = d;
@@ -358,7 +370,7 @@ function redraw() {
     }
 
     force.start();
-    console.log("End of redraw");
+    //console.log("End of redraw");
 
 }
 
