@@ -1,62 +1,97 @@
-//-------------------------------------
-//-------------button def-------------
-//-------------------------------------
-$(".submit").on("click",function (e) {
-    console.log("Button clicked");
-});
+//---------------------------------------
+//-------------function defs-------------
+//---------------------------------------
+var getRNAfromPic = function() {    //randomized
+    var return_value = {};
+    $.getJSON("http://pic8.hditem.com/iserv/api/rna/", function(data) {
+        var choices = data;
+        var pick = Math.floor(choices.length * Math.random());
+        var name = choices[pick];
+        var rna_json = {};
+        $.getJSON("http://pic8.hditem.com/iserv/api/rna/"+name, function(data) {
+            rna_json = data;
+            return_value = {moleculeId:name, json:rna_json};
 
 
-//-------------------------------------
-//-------------getSeq part-------------
-//-------------------------------------
-var n = [];
-var readSeq = function () {
-    //console.log("calling");
-    var input_seq = $(".inseq").val();
-    if (input_seq === "") return;
 
-    for (i in input_seq) {
-        var l;
-        switch (input_seq[i]) {
-            case 'A':
-            case 'a':
-                l = 'a';
-                break;
-            case 'C':
-            case 'c':
-                l = 'c';
-                break;
-            case 'G':
-            case 'g':
-                l = 'g';
-                break;
-            case 'U':
-            case 'u':
-                l = 'u';
-                break;
-            default:
-                l = 'a';
-                break;
-        }
-        n.push({
-            "base": l
+            //---------moved into call back function------------
+            var rnaMolecule = return_value;
+
+
+
+            rna_id = rnaMolecule.moleculeId;
+            nodes = rnaMolecule.json.rna;
+
+            links = rnaMolecule.json.connections;
+
+            force
+                .nodes(nodes)
+                .links(links);
+
+
+
+            force.on("tick", function (e) {
+                link
+                    .attr("x1", function (d) {
+                        return d.source.x;
+                    })
+                    .attr("y1", function (d) {
+                        return d.source.y;
+                    })
+                    .attr("x2", function (d) {
+                        return d.target.x;
+                    })
+                    .attr("y2", function (d) {
+                        return d.target.y;
+                    });
+
+                node
+                    .attr("cx", function (d) {
+                        return d.x;
+                    })
+                    .attr("cy", function (d) {
+                        return d.y;
+                    });
+            })
+                .start();
+
+
+
+
+
+            // line displayed when dragging new nodes
+            drag_line = svg.append("line")
+                .attr("class", "h-bond")
+                .attr("x1", 0)
+                .attr("y1", 0)
+                .attr("x2", 0)
+                .attr("y2", 0);
+
+            // get layout properties
+            nodes = force.nodes();
+            node = svg.selectAll(".node");
+
+
+            link = svg.selectAll(".link");
+            links = force.links();
+
+            // add keyboard callback
+
+            d3.select(window)
+                .on("keydown", keydown);
+            redraw();
+
+            //---------END moved into call back function--------
+
+
+
+
+
         });
-    }
-    //console.log("returning: " + n);
+
+    });
+
 };
-
-
-$(".btn").on("click", function (event) {
-    readSeq();
-});
-
-$(".btn").on("keypress", function (event) {
-    if (event.keyCode === 13) //enter
-        readSeq();
-});
-
-
-
 
 
 
@@ -64,8 +99,8 @@ $(".btn").on("keypress", function (event) {
 //-------------play part-------------
 //-----------------------------------
 
-var width = 960,
-    height = 500;
+var width = 1024,
+    height = 600;
 
 // mouse event vars
 var selected_node = null,
@@ -104,116 +139,70 @@ var force = d3.layout.force()
     .charge(-150)
     .linkDistance(function (d) { if (d.type===0) return 20; else return 10;});
 
-//read in data
-//d3.json("rna/hairpinloop_5s.json", function(error, graph) {
-    //var nodes = graph.nodes;
-    var nodes = [
-        {base:"g",available:1},
-        {base:"g",available:1},
-        {base:"g",available:1},
-        {base:"g",available:1},
-        {base:"a",available:1},
-        {base:"a",available:1},
-        {base:"a",available:1},
-        {base:"c",available:1},
-        {base:"c",available:1},
-        {base:"c",available:1},
-        {base:"c",available:1},
-    ];
+var rna_id = "", nodes = [], links = [], node, link, drag_line;
+rnaMolecule = getRNAfromPic(); //is an object with "moleculeId" and "json"
 
+//---------moved into call back function------------
 
-
-
-    var links = function () {
-        a = [];
-        for (var i = 0; i < nodes.length - 1; i++) {
-            a.push({source: i, target: i + 1, type:0})
-        }
-        return a;
-    }();
-
-    force
-        .nodes(nodes)
-        .links(links);
-
-
-    force.on("tick", function (e) {
-        link
-            .attr("x1", function (d) {
-                return d.source.x;
-            })
-            .attr("y1", function (d) {
-                return d.source.y;
-            })
-            .attr("x2", function (d) {
-                return d.target.x;
-            })
-            .attr("y2", function (d) {
-                return d.target.y;
-            });
-
-        node
-            .attr("cx", function (d) {
-                return d.x;
-            })
-            .attr("cy", function (d) {
-                return d.y;
-            });
-    })
-        .start();
-
-
-//        force
-//                .nodes(nodes)
-//                .links(links)
+//var rna_id = rnaMolecule.moleculeId;
+//var nodes = rnaMolecule.json.rna;
 //
-
-//        var link = svg.selectAll(".link")
-//                .data(links)
-//                .enter().append("line")
-//                .attr("class", "link")
-//                .style("stroke-width", function(d) { return Math.sqrt(d.value); });
+//var links = rnaMolecule.json.connections;
 //
-//        var node = svg.selectAll(".node")
-//                .data(nodes)
-//                .enter().append("circle")
-//                .attr("class", "node")
-//                .attr("r", 5)
-//                .style("fill", function(d) { return color(d.group); })
-//                .call(force.drag);
+//force
+//    .nodes(nodes)
+//    .links(links);
 //
-//        force.on("tick", function(e) {
-//            link
-//                    .attr("x1", function(d) { return d.source.x; })
-//                    .attr("y1", function(d) { return d.source.y; })
-//                    .attr("x2", function(d) { return d.target.x; })
-//                    .attr("y2", function(d) { return d.target.y; });
 //
-//            node
-//                    .attr("cx", function(d) { return d.x; })
-//                    .attr("cy", function(d) { return d.y; });
+//force.on("tick", function (e) {
+//    link
+//        .attr("x1", function (d) {
+//            return d.source.x;
+//        })
+//        .attr("y1", function (d) {
+//            return d.source.y;
+//        })
+//        .attr("x2", function (d) {
+//            return d.target.x;
+//        })
+//        .attr("y2", function (d) {
+//            return d.target.y;
 //        });
+//
+//    node
+//        .attr("cx", function (d) {
+//            return d.x;
+//        })
+//        .attr("cy", function (d) {
+//            return d.y;
+//        });
+//})
+//    .start();
+//
+//
+//
+//
+//
+//// line displayed when dragging new nodes
+//var drag_line = svg.append("line")
+//    .attr("class", "h-bond")
+//    .attr("x1", 0)
+//    .attr("y1", 0)
+//    .attr("x2", 0)
+//    .attr("y2", 0);
+//
+//// get layout properties
+//var nodes = force.nodes(),
+//    links = force.links(),
+//    node = svg.selectAll(".node"),
+//    link = svg.selectAll(".link");
+//
+//// add keyboard callback
+//d3.select(window)
+//    .on("keydown", keydown);
+//redraw();
 
-
-
-// line displayed when dragging new nodes
-var drag_line = svg.append("line")
-    .attr("class", "h-bond")
-    .attr("x1", 0)
-    .attr("y1", 0)
-    .attr("x2", 0)
-    .attr("y2", 0);
-
-// get layout properties
-var nodes = force.nodes(),
-    links = force.links(),
-    node = svg.selectAll(".node"),
-    link = svg.selectAll(".link");
-
-// add keyboard callback
-d3.select(window)
-    .on("keydown", keydown);
-redraw();
+//---------END moved into call back function--------
 
 
 function mousedown() {
@@ -330,10 +319,10 @@ function redraw() {
                 if (mousedown_node && mousedown_node.available) {
                     mouseup_node = d;
                     if (mouseup_node == mousedown_node) { resetMouseVars(); return; }
-                    if ( (mousedown_node.base == 'a' && mouseup_node.base == 'a') ||
-                        (mousedown_node.base == 'u' && mouseup_node.base == 'a') ||
-                        (mousedown_node.base == 'g' && mouseup_node.base == 'c') ||
-                        (mousedown_node.base == 'c' && mouseup_node.base == 'g')  ) {
+                    if ( (mousedown_node.nucleotide == 'a' && mouseup_node.nucleotide == 'a') ||
+                        (mousedown_node.nucleotide == 'u' && mouseup_node.nucleotide == 'a') ||
+                        (mousedown_node.nucleotide == 'g' && mouseup_node.nucleotide == 'c') ||
+                        (mousedown_node.nucleotide == 'c' && mouseup_node.nucleotide == 'g')  ) {
                         // add link
                         var link = {source: mousedown_node, target: mouseup_node, type:1};
                         links.push(link);
@@ -354,8 +343,8 @@ function redraw() {
         })
         .transition()
         .duration(750)
-        .ease("elastic")
-        .style("fill", function(d) { return color(d.base); });
+        .ease("elastic");
+    node.style("fill", function(d) { return color(d.nucleotide); });
 
     node.exit().transition()
         .attr("r", 0)
@@ -403,8 +392,6 @@ function keydown() {
     }
 }
 
-
-
 function rescale() {
     trans=d3.event.translate;
     scale=d3.event.scale;
@@ -413,4 +400,44 @@ function rescale() {
             "translate(" + trans + ")"
             + " scale(" + scale + ")");
 }
+
+//-----------------------------------------------
+//-------------button/submission def-------------
+//-----------------------------------------------
+var warning = false;
+textfield = $("#inputEmail");
+button = $(".submit");
+
+button.on("click", function (event) {
+    if (textfield.val() == "" && !warning) {
+        $(".warning").append($('<p>').text("Please enter your name"));
+    } else if (textfield.val() == "" && warning) {
+        //nothing
+    } else {
+        postSubmissionJSON(nodes,links,rna_id,textfield.val());
+        $(".warning").append($('<p>').text("SUBMITTED"));
+    }
+});
+
+var postSubmissionJSON = function (n, l, rna_id, username) {
+    $.ajax({
+        type: "POST",
+        url: "http://pic8.hditem.com/iserv/api/rna/" + rna_id + "_" + (new Date()).getTime() +  "_" + username,
+        data: makeSubmissionJSON(n, l),
+        dataType: "json"})
+};
+
+var makeSubmissionJSON = function(n, l) {
+    var r = [];
+    for (item in n) {
+        r.push({"nucleotide":n[item].nucleotide,"available":n[item].available});
+    }
+
+    var c = [];
+    for (item in l) {
+        c.push({"source":l[item].source.index, "target":l[item].target.index, "type":l[item].type});
+    }
+    return {"rna":r, "connections":c};
+
+};
 

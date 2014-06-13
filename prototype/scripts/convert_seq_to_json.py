@@ -9,15 +9,20 @@ while (line):
 	line = f.readline().strip()
 f.close()
 
-print '{"nodes":['
+print '{rna:['
 for letter in continuous_seq:
 	if letter is "A" or letter is "a":
-		print '{base:"a",available:1},'
+		print '{nucleotide:"a",available:1},'
 	elif letter is "U" or letter is "u":
-		print '{base:"u",available:1},'
+		print '{nucleotide:"u",available:1},'
 	elif letter is "G" or letter is "g":
-		print '{base:"g",available:1},'
+		print '{nucleotide:"g",available:1},'
 	elif letter is "C" or letter is "c":
-		print '{base:"c",available:1},'
+		print '{nucleotide:"c",available:1},'
 
-print "]}"
+print '],connections:['
+
+for c in range(len(continuous_seq)-1):
+	print '{source:'+str(c)+',target:'+str(c+1)+',type:0},'
+
+print ']}'
