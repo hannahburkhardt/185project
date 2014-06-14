@@ -3,12 +3,12 @@
 //---------------------------------------
 var getRNAfromPic = function() {    //randomized
     var return_value = {};
-    $.getJSON("http://pic8.hditem.com/iserv/api/rna/", function(data) {
+    $.getJSON("http://data.hditem.com/iserv/api/rna/", function(data) {
         var choices = data;
         var pick = Math.floor(choices.length * Math.random());
         var name = choices[pick];
         var rna_json = {};
-        $.getJSON("http://pic8.hditem.com/iserv/api/rna/"+name, function(data) {
+        $.getJSON("http://data.hditem.com/iserv/api/rna/"+name, function(data) {
             rna_json = data;
             return_value = {moleculeId:name, json:rna_json};
 
@@ -416,13 +416,14 @@ button.on("click", function (event) {
     } else {
         postSubmissionJSON(nodes,links,rna_id,textfield.val());
         $(".warning").append($('<p>').text("SUBMITTED"));
+        window.location = "submitted.html";
     }
 });
 
 var postSubmissionJSON = function (n, l, rna_id, username) {
     $.ajax({
         type: "POST",
-        url: "http://pic8.hditem.com/iserv/api/rna/" + rna_id + "_" + (new Date()).getTime() +  "_" + username,
+        url: "http://data.hditem.com/iserv/api/rna/" + rna_id + "_" + (new Date()).getTime() +  "_" + username,
         data: makeSubmissionJSON(n, l),
         dataType: "json"})
 };
